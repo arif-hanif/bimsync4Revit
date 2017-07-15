@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("bimsync")]
-[assembly: AssemblyDescription("Revit Add-In Description for bimsync")]
+[assembly: AssemblyDescription("bimsync plugin for Revit")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Autodesk Inc.")]
-[assembly: AssemblyProduct("bimsync Revit C# .NET Add-In")]
-[assembly: AssemblyCopyright("Copyright 2017 (C) Jeremy Tammik, Autodesk Inc.")]
+[assembly: AssemblyCompany("BIM 42")]
+[assembly: AssemblyProduct("bimsync plugin for Revit")]
+[assembly: AssemblyCopyright("BIM 42")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

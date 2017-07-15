@@ -47,6 +47,12 @@ namespace bimsync.Commands
         {
             Uri baseUrl = new Uri("https://api.bimsync.com");
 
+            //Test for an internet connection
+            if (!Services.CheckForInternetConnection())
+            {
+                throw new Exception("Your computer seems to be currently offline. Please connect it to the internet and try again.");
+            }
+
             //Get Revit windows handles
             IntPtr revitWindow = Services.GetForegroundWindow();
 
@@ -140,5 +146,7 @@ namespace bimsync.Commands
 
             return responseToken.Data;
         }
+
+
     }
 }

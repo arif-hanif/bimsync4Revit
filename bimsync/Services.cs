@@ -8,6 +8,7 @@ using System.Xml.Serialization;
 using System.IO;
 using RestSharp;
 using System.Runtime.InteropServices;
+using System.Net;
 
 namespace bimsync
 {
@@ -39,6 +40,12 @@ namespace bimsync
 
         public static Token RefreshToken(Token token)
         {
+            //Test for an internet connection
+            if (!Services.CheckForInternetConnection())
+            {
+                throw new Exception("Your computer seems to be currently offline. Please connect it to the internet and try again.");
+            }
+
             RestClient client = new RestClient("https://api.bimsync.com");
 
             //Refresh token
@@ -76,6 +83,24 @@ namespace bimsync
                         fileStream.Close();
                     }
                 }
+            }
+        }
+
+        public static bool CheckForInternetConnection()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    using (var stream = client.OpenRead("http://www.google.com"))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
     }

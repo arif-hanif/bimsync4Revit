@@ -31,6 +31,13 @@ namespace bimsync
                     //Hide the logged UI 
                     UI.Ribbon.HideLoggedPanel();
                 }
+                //Test for an internet connection
+                else if (!Services.CheckForInternetConnection())
+                {
+                    //There is no availlable token, we have to login first
+                    //Hide the logged UI 
+                    UI.Ribbon.HideLoggedPanel();
+                }
                 else
                 {
                     //We have to check if the current token is still valid
@@ -51,7 +58,7 @@ namespace bimsync
                         UI.Ribbon.HideInitialPanel();
                     }
                 }
-                
+
                 return Result.Succeeded;
             }
             catch (Exception ex)
