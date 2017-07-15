@@ -5,10 +5,6 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Reflection;
-using System.IO;
 #endregion
 
 namespace bimsync
@@ -17,7 +13,52 @@ namespace bimsync
     {
         public Result OnStartup(UIControlledApplication a)
         {
-            return Result.Succeeded;
+            try
+            {
+                //Create the initial UI
+                //Create the panel for the plugin
+                RibbonPanel bimsyncPanel = a.CreateRibbonPanel("bimsync");
+
+                //Create two sets of button
+                UI.Ribbon.CreateInitialPanel(bimsyncPanel);
+                UI.Ribbon.CreateLoggedPanel(bimsyncPanel);
+
+                //check if the user is connected
+                Token token = Properties.Settings.Default["Token"] as Token;
+                if (string.IsNullOrEmpty(token.access_token))
+                {
+                    //There is no availlable token, we have to authorize the app
+                    //Hide the logged UI 
+                    UI.Ribbon.HideLoggedPanel();
+                }
+                else
+                {
+                    //We have to check if the current token is still valid
+                    Token newToken = Services.RefreshToken(token);
+                    if (string.IsNullOrEmpty(newToken.access_token))
+                    {
+                        //The token is no longer valid, we have to authorize the app again
+                        //Hide the logged UI
+                        UI.Ribbon.HideLoggedPanel();
+                    }
+                    else
+                    {
+                        //The token is valid, we save the new one
+                        Properties.Settings.Default["Token"] = newToken;
+                        Properties.Settings.Default.Save();
+
+                        //We show the logged UI
+                        UI.Ribbon.HideInitialPanel();
+                    }
+                }
+                
+                return Result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                // Return Failure
+                return Result.Failed;
+            }
         }
 
         public Result OnShutdown(UIControlledApplication a)
@@ -26,49 +67,5 @@ namespace bimsync
         }
     }
 
-    class Icons
-    {
-        public static void CreateIcons(RibbonPanel bim42Panel)
-        {
-            //Retrive dll path
-            string DllPath = Assembly.GetExecutingAssembly().Location;
 
-            //Create contextual help
-            string helpPath = Path.Combine(Path.GetDirectoryName(DllPath), "bimsyncHelp.html");
-            ContextualHelp help = new ContextualHelp(ContextualHelpType.ChmFile, helpPath);
-
-            //Add Login Button
-            PushButtonData loginButton = new PushButtonData("loginButton", "Login", DllPath, "AlignTag.AlignLeft");
-            loginButton.ToolTip = "Align Tags Left";
-            loginButton.LargeImage = RetriveImage("AlignTag.Resources.AlignLeftLarge.png");
-            loginButton.Image = RetriveImage("AlignTag.Resources.AlignLeftSmall.png");
-            loginButton.SetContextualHelp(help);
-
-            bim42Panel.AddItem(loginButton);
-
-        }
-
-        private static ImageSource RetriveImage(string imagePath)
-        {
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(imagePath);
-
-            switch (imagePath.Substring(imagePath.Length - 3))
-            {
-                case "jpg":
-                    var jpgDecoder = new System.Windows.Media.Imaging.JpegBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-                    return jpgDecoder.Frames[0];
-                case "bmp":
-                    var bmpDecoder = new System.Windows.Media.Imaging.BmpBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-                    return bmpDecoder.Frames[0];
-                case "png":
-                    var pngDecoder = new System.Windows.Media.Imaging.PngBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-                    return pngDecoder.Frames[0];
-                case "ico":
-                    var icoDecoder = new System.Windows.Media.Imaging.IconBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-                    return icoDecoder.Frames[0];
-                default:
-                    return null;
-            }
-        }
-    }
 }

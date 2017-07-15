@@ -40,6 +40,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI">
       <HintPath>$(ProgramW6432)\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -49,19 +53,83 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.XML" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
-    <Compile Include="Command.cs" />
+    <Compile Include="Commands\Profile.cs" />
+    <Compile Include="Commands\Login.cs" />
+    <Compile Include="Commands\Logout.cs" />
+    <Compile Include="Commands\Upload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Services.cs" />
+    <Compile Include="UI\ModelSelection.xaml.cs">
+      <DependentUpon>ModelSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UI.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="bimsync.addin" />
+    <EmbeddedResource Include="Resources\bimsyncSharedParameter.txt" />
+    <EmbeddedResource Include="Resources\cloud-upload_large.png" />
+    <EmbeddedResource Include="Resources\cloud-upload_small.png" />
+    <EmbeddedResource Include="Resources\power-off_large.png" />
+    <EmbeddedResource Include="Resources\power-off_small.png" />
+    <EmbeddedResource Include="Resources\logo_large.png" />
+    <EmbeddedResource Include="Resources\logo_small.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\appstore-combined.min.css" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\appstore-combined.min.js" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\EXC_Title.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\favicon.ico" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\ga.js" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\helpDoc.js" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\jquery.raty.js" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\modernizr.js" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_50638433-811e-43b7-b7db-97dc49193200_.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_715c4414-da51-4c27-99f0-9900f69f6df6_.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_986e5734-39c8-4486-a4e6-160fcdc213bb_.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_ColorsByModel.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_CompareModels.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_IdentifyElements.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_Interface2.PNG" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_LinkedFilesSchedule.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\resized_427d3b0d-4477-4c42-b17b-b47f71377f47_.png" />
+    <EmbeddedResource Include="Resources\bimsyncHelp.html" />
+    <EmbeddedResource Include="Resources\user_large.png" />
+    <EmbeddedResource Include="Resources\user_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\bimsyncHelp_Files\ClientResources" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\ModelSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "$(AppData)\Autodesk\REVIT\Addins\2017" copy "$(ProjectDir)*.addin" "$(AppData)\Autodesk\REVIT\Addins\2017"
-if exist "$(AppData)\Autodesk\REVIT\Addins\2017" copy "$(ProjectDir)$(OutputPath)*.dll" "$(AppData)\Autodesk\REVIT\Addins\2017"</PostBuildEvent>
+if exist "$(AppData)\Autodesk\REVIT\Addins\2017" copy "$(ProjectDir)$(OutputPath)*.dll" "$(AppData)\Autodesk\REVIT\Addins\2017"
+
+copy "$(ProjectDir)Resources\bimsyncHelp.html" "$(AppData)\Autodesk\REVIT\Addins\2018"
+mkdir "$(AppData)\Autodesk\REVIT\Addins\2018\bimsyncHelp_Files"
+copy "$(ProjectDir)Resources\bimsyncHelp_Files" "$(AppData)\Autodesk\REVIT\Addins\2018\bimsyncHelp_Files"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
