@@ -11,20 +11,24 @@
 
 ## Key Features
 
+This plugin allows you to upload effortlessly your Revit models to bimsync®.
+
 * Login into your bimsync® account
 * Select your bimsync® project and model and upload your Revit model as an IFC file in a single click
 * Save the references to your bimsync® project and model for futur uploads
 
-This plugin is developed by a third party, and is **_not_** endorsed by Catenda.
+A free bimsync® trial is available for new users on the [bimsync® website](https://bimsync.com/).
+
+This plugin is developed by a third party, and is **_not_** endorsed by Catenda®.
 
 ## Getting Started
 
 Edit bimsync.csproj, and make sure that the following lines a correctly pointing to your Revit installation folder:
-Line 29:     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
-Line 39:     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
-Line 48:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
-Line 52:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
-Line 129 to 134: <PostBuildEvent>...</PostBuildEvent>
+* Line 29:     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
+* Line 39:     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
+* Line 48:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+* Line 52:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+* Line 129 to 134: <PostBuildEvent>...</PostBuildEvent>
 
 Open the solution in Visual Studio 2017, buid it to retrieve the packages, and hit "Start" to run Revit in debug mode.
 
@@ -38,11 +42,11 @@ Download the installer on the [Autodesk App Exchange](https://apps.autodesk.com/
 
 ### The (not so) easy way
 
-You install bimsync® just like any other Revit add-in, by copying the add-in manifest ("bimsync.addin"), the assembly DLL ("bimsync.dll"), its dependancy (here, "RestSharp.dll") and the associated help files ("bimsyncHelp.html" and the "bimsyncHelp_Files" folder) to the Revit Add-Ins folder (%APPDATA%\Autodesk\Revit\Addins\2018).
+You install bimsync® just [like any other Revit add-in](http://help.autodesk.com/view/RVT/2018/ENU/?guid=GUID-4FFDB03E-6936-417C-9772-8FC258A261F7), by copying the add-in manifest ("bimsync.addin"), the assembly DLL ("bimsync.dll"), its dependancy (here, "RestSharp.dll") and the associated help files ("bimsyncHelp.html" and the "bimsyncHelp_Files" folder) to the Revit Add-Ins folder (%APPDATA%\Autodesk\Revit\Addins\2018).
 
 If you specify the full DLL pathname in the add-in manifest, it can also be located elsewhere. However, this DLL, its dependanties and help files must be locted in the same folder.
 
-Futhermore, the Visual Studio solution contain all the necessary post-build scripts to copy these file into appropriates folders.
+Futhermore, the Visual Studio solution contain all the necessary post-build scripts to copy these files into appropriates folders.
 
 ## Built With
 
