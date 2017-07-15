@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2017\Revit.exe</StartProgram>
+    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2017\Revit.exe</StartProgram>
+    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -45,11 +45,11 @@
       <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+      <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -76,7 +76,9 @@
     <Compile Include="UI\UI.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bimsync.addin" />
+    <Content Include="bimsync.addin">
+      <SubType>Designer</SubType>
+    </Content>
     <EmbeddedResource Include="Resources\bimsyncSharedParameter.txt" />
     <EmbeddedResource Include="Resources\cloud-upload_large.png" />
     <EmbeddedResource Include="Resources\cloud-upload_small.png" />
@@ -124,8 +126,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist "$(AppData)\Autodesk\REVIT\Addins\2017" copy "$(ProjectDir)*.addin" "$(AppData)\Autodesk\REVIT\Addins\2017"
-if exist "$(AppData)\Autodesk\REVIT\Addins\2017" copy "$(ProjectDir)$(OutputPath)*.dll" "$(AppData)\Autodesk\REVIT\Addins\2017"
+    <PostBuildEvent>if exist "$(AppData)\Autodesk\REVIT\Addins\2018" copy "$(ProjectDir)*.addin" "$(AppData)\Autodesk\REVIT\Addins\2018"
+if exist "$(AppData)\Autodesk\REVIT\Addins\2018" copy "$(ProjectDir)$(OutputPath)*.dll" "$(AppData)\Autodesk\REVIT\Addins\2018"
 
 copy "$(ProjectDir)Resources\bimsyncHelp.html" "$(AppData)\Autodesk\REVIT\Addins\2018"
 mkdir "$(AppData)\Autodesk\REVIT\Addins\2018\bimsyncHelp_Files"
@@ -139,7 +141,7 @@ copy "$(ProjectDir)Resources\bimsyncHelp_Files" "$(AppData)\Autodesk\REVIT\Addin
   </Target>
   -->
   <Target Name="AfterClean">
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2017\bimsync.addin" />
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2017\bimsync.dll" />
+    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2018\bimsync.addin" />
+    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2018\bimsync.dll" />
   </Target>
 </Project>

@@ -1,20 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
-  <AddIn Type="Command">
-    <Text>Command bimsync</Text>
-    <Description>Some description for bimsync</Description>
-    <Assembly>bimsync.dll</Assembly>
-    <FullClassName>bimsync.Command</FullClassName>
-    <ClientId>3e03c2f3-544b-4e03-8f13-0aaa03468da8</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
-  </AddIn>
   <AddIn Type="Application">
-    <Name>Application bimsync</Name>
+    <Name>bimsync</Name>
     <Assembly>bimsync.dll</Assembly>
     <FullClassName>bimsync.App</FullClassName>
     <ClientId>726c898e-8e40-4384-9317-21731ebdfddf</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+    <VendorId>BIM42</VendorId>
+    <VendorDescription>BIM 42, https://bim42.com</VendorDescription>
   </AddIn>
 </RevitAddIns>
