@@ -5,7 +5,7 @@
   <br>
 </h1>
 
-A bimsync® unoffical plugin for Revit
+<h4 align="center">A bimsync® unoffical plugin for Revit.</h4>
 
 ![screenshot](https://github.com/simonmoreau/bimsync4Revit/blob/master/files/bimsync_upload.gif)
 
