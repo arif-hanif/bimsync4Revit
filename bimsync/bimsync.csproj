@@ -79,6 +79,11 @@
     <Content Include="bimsync.addin">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Resources\bimsyncHelp_Files\appstore-combined.min.css" />
+    <Content Include="Resources\bimsyncHelp_Files\original_72d21fcd-c4f4-4d42-9c96-ae5173d94acb_.gif" />
+    <Content Include="Resources\bimsyncHelp_Files\original_f5b77168-b7fd-451c-857d-862fe3d5edc0_.gif" />
+    <Content Include="Resources\bimsyncHelp_Files\resized_624379e1-4bac-467d-bf1a-a1241a0fbccd_.png" />
+    <Content Include="Resources\bimsyncHelp_Files\totop50.png" />
     <EmbeddedResource Include="Resources\bimsyncSharedParameter.txt" />
     <EmbeddedResource Include="Resources\cloud-upload_large.png" />
     <EmbeddedResource Include="Resources\cloud-upload_small.png" />
@@ -86,23 +91,6 @@
     <EmbeddedResource Include="Resources\power-off_small.png" />
     <EmbeddedResource Include="Resources\logo_large.png" />
     <EmbeddedResource Include="Resources\logo_small.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\appstore-combined.min.css" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\appstore-combined.min.js" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\EXC_Title.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\favicon.ico" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\ga.js" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\helpDoc.js" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\jquery.raty.js" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\modernizr.js" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_50638433-811e-43b7-b7db-97dc49193200_.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_715c4414-da51-4c27-99f0-9900f69f6df6_.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_986e5734-39c8-4486-a4e6-160fcdc213bb_.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_ColorsByModel.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_CompareModels.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_IdentifyElements.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_Interface2.PNG" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\original_LinkedFilesSchedule.png" />
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\resized_427d3b0d-4477-4c42-b17b-b47f71377f47_.png" />
     <EmbeddedResource Include="Resources\bimsyncHelp.html" />
     <EmbeddedResource Include="Resources\user_large.png" />
     <EmbeddedResource Include="Resources\user_small.png" />
@@ -114,9 +102,13 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\bimsyncHelp_Files\ClientResources" />
+    <None Include="Resources\bimsyncHelp_Files\appstore-3rdlibs.min.js.download" />
+    <None Include="Resources\bimsyncHelp_Files\appstore-combined.min.js.download" />
+    <None Include="Resources\bimsyncHelp_Files\bootstrap.min.js.download" />
+    <None Include="Resources\bimsyncHelp_Files\ClientResources" />
+    <None Include="Resources\bimsyncHelp_Files\ga.js.download" />
+    <None Include="Resources\bimsyncHelp_Files\helpDoc.js.download" />
+    <None Include="Resources\bimsyncHelp_Files\jquery.raty.js.download" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\ModelSelection.xaml">
@@ -124,6 +116,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "$(AppData)\Autodesk\REVIT\Addins\2018" copy "$(ProjectDir)*.addin" "$(AppData)\Autodesk\REVIT\Addins\2018"

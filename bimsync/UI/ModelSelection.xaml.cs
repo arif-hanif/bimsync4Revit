@@ -177,7 +177,11 @@ namespace bimsync.UI
         private void comboBoxModels_changed(object sender, SelectionChangedEventArgs e)
         {
             Model selectedModel = comboBoxModels.SelectedItem as Model;
-            _modelId = selectedModel.id;
+            if (selectedModel!= null)
+            {
+                _modelId = selectedModel.id;
+            }
+            
         }
     }
 }

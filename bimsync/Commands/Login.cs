@@ -81,7 +81,7 @@ namespace bimsync.Commands
 
             // Sends an HTTP response to the browser.
             var response = context.Response;
-            string responseString = string.Format("<html><head><meta http-equiv='refresh' content='10;url=https://www.bimsync.com'></head><body>You can now return to Revit.</body></html>");
+            string responseString = string.Format("<html><head><meta http-equiv='refresh' content='5;url=https://www.bimsync.com'></head><body>You can now return to Revit.</body></html>");
             var buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
             response.ContentLength64 = buffer.Length;
             var responseOutput = response.OutputStream;
