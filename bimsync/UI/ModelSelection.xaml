@@ -83,8 +83,8 @@
         </TextBox>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <!--<ProgressBar></ProgressBar>-->
-            <Button Content="Export" IsDefault="True" Name="Export_Button"
-                    IsEnabled="{Binding ElementName=commentTextBox,Path=Text.Length}" Click="Export_Button_Click">
+            <Button Content="Upload" IsDefault="True" Name="Upload_Button"
+                    IsEnabled="{Binding ElementName=commentTextBox,Path=Text.Length}" Click="Upload_Button_Click">
             </Button>
             <Button Content="Cancel" Name="Cancel_Button"
                     IsEnabled="True" Click="Cancel_Button_Click"/>

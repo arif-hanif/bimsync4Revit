@@ -1,7 +1,4 @@
-# bimsync4Revit
-A bimsync plugin for Revit
-
-<p align="center"><img width=12.5% src="https://github.com/simonmoreau/bimsync4Revit/blob/master/bimsync/Resources/logo_large.png"></p>
+<p align="center"><img width=12.5% src="https://github.com/simonmoreau/bimsync4Revit/blob/master/files/bimsyncLogo.png"></p>
 <h1 align="center">
   <br>
   bimsync®
@@ -14,19 +11,36 @@ A bimsync® unoffical plugin for Revit
 
 ## Key Features
 
-* Login into your bimsync account
-* Select and save the bimsync project and model
-* Upload your Revit model as an IFC file in a single click
+* Login into your bimsync® account
+* Select your bimsync® project and model and upload your Revit model as an IFC file in a single click
+* Save the references to your bimsync® project and model for futur uploads
 
 ## Getting Started
 
-Open the solution in Visual Studio 2017, retrieve the packages and hit Run.
-Make sure that the path to your Revit installation are properly set up (Explain that better)
+Edit bimsync.csproj, and make sure that the following lines a correctly pointing to your Revit installation folder:
+Line 29:     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
+Line 39:     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
+Line 48:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+Line 52:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+Line 129 to 134: <PostBuildEvent>...</PostBuildEvent>
 
-## Deployment
+Open the solution in Visual Studio 2017, buid it to retrieve the packages, and hit "Start" to run Revit in debug mode.
 
-The Visual Studio solution contain the necessary script to co
-Copy-Paste the bimsync.dll, 
+## Installation
+
+There is two ways to install this plugin:
+
+### The easy way
+
+Download the installer on the [Autodesk App Exchange](https://apps.autodesk.com/RVT/en/Home/Index)
+
+### The (not so) easy way
+
+You install bimsync® just like any other Revit add-in, by copying the add-in manifest ("bimsync.addin"), the assembly DLL ("bimsync.dll"), its dependancy (here, "RestSharp.dll") and the associated help files ("bimsyncHelp.html" and the "bimsyncHelp_Files" folder) to the Revit Add-Ins folder (%APPDATA%\Autodesk\Revit\Addins\2018).
+
+If you specify the full DLL pathname in the add-in manifest, it can also be located elsewhere. However, this DLL, its dependanties and help files must be locted in the same folder.
+
+Futhermore, the Visual Studio solution contain all the necessary post-build scripts to copy these file into appropriates folders.
 
 ## Built With
 
@@ -34,15 +48,29 @@ Copy-Paste the bimsync.dll,
 * [RestSharp](http://restsharp.org/) - The .NET REST client
 * The Visual Studio Revit C# and VB add-in templates from [The Building Coder](http://thebuildingcoder.typepad.com/blog/2017/04/revit-2018-visual-studio-c-and-vb-net-add-in-wizards.html)
 
-## Contributing
 
-Please feel free to propose pull request, I would be happy to integrate your improvements.
+## Development
+Want to contribute? Great, I would be happy to integrate your improvements!
+
+To fix a bug or enhance an existing module, follow these steps:
+
+- Fork the repo
+- Create a new branch (`git checkout -b improve-feature`)
+- Make the appropriate changes in the files
+- Add changes to reflect the changes made
+- Commit your changes (`git commit -am 'Improve feature'`)
+- Push to the branch (`git push origin improve-feature`)
+- Create a Pull Request 
+
+## Bug / Feature Request
+
+If you find a bug (connection issue, error while uploading, ...), kindly open an issue [here](https://github.com/simonmoreau/bimsync4Revit/issues/new) by including your search query and the expected result.
+
+If you'd like to request a new function, feel free to do so by opening an issue [here](https://github.com/simonmoreau/bimsync4Revit/issues/new). Please include sample queries and their corresponding results.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Credits
-
-* Icons by Oksana Latysheva and Dmitry Mirolyubov from the [Noun Project](https://thenounproject.com)
-* BCF Serializing/Deserializing from [XBIM](https://github.com/xBimTeam/XbimBCF)
+## Contact information
+This software is an open-source project mostly maintained by myself, Simon Moreau. If you have any questions or request, feel free to contact me at [simon@bim42.com](mailto:simon@bim42.com) or on Twitter [@bim42](https://twitter.com/bim42?lang=en).

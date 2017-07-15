@@ -160,7 +160,7 @@ namespace bimsync.UI
             this.Close();
         }
 
-        private void Export_Button_Click(object sender, RoutedEventArgs e)
+        private void Upload_Button_Click(object sender, RoutedEventArgs e)
         {
             Comment = commentTextBox.Text;
             this.DialogResult = true;
