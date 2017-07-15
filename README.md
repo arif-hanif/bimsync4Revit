@@ -7,13 +7,15 @@
 
 A bimsync® unoffical plugin for Revit
 
-![screenshot](https://github.com/simonmoreau/Sloth/blob/master/Images/uploadBCF.gif)
+![screenshot](https://github.com/simonmoreau/bimsync4Revit/blob/master/files/bimsync_upload.gif)
 
 ## Key Features
 
 * Login into your bimsync® account
 * Select your bimsync® project and model and upload your Revit model as an IFC file in a single click
 * Save the references to your bimsync® project and model for futur uploads
+
+This plugin is developed by a third party, and is **_not_** endorsed by Catenda.
 
 ## Getting Started
 
@@ -48,7 +50,6 @@ Futhermore, the Visual Studio solution contain all the necessary post-build scri
 * [RestSharp](http://restsharp.org/) - The .NET REST client
 * The Visual Studio Revit C# and VB add-in templates from [The Building Coder](http://thebuildingcoder.typepad.com/blog/2017/04/revit-2018-visual-studio-c-and-vb-net-add-in-wizards.html)
 
-
 ## Development
 Want to contribute? Great, I would be happy to integrate your improvements!
 
@@ -64,9 +65,9 @@ To fix a bug or enhance an existing module, follow these steps:
 
 ## Bug / Feature Request
 
-If you find a bug (connection issue, error while uploading, ...), kindly open an issue [here](https://github.com/simonmoreau/bimsync4Revit/issues/new) by including your search query and the expected result.
+If you find a bug (connection issue, error while uploading, ...), kindly open an issue [here](https://github.com/simonmoreau/bimsync4Revit/issues/new) by including a screenshot of your problem and the expected result.
 
-If you'd like to request a new function, feel free to do so by opening an issue [here](https://github.com/simonmoreau/bimsync4Revit/issues/new). Please include sample queries and their corresponding results.
+If you'd like to request a new function, feel free to do so by opening an issue [here](https://github.com/simonmoreau/bimsync4Revit/issues/new). Please include workflows samples and their corresponding results.
 
 ## License
 
