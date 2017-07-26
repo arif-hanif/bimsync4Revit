@@ -16,6 +16,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using RestSharp;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using BIM.IFC.Export.UI;
 #endregion
 
 namespace bimsync.UI
@@ -24,7 +26,8 @@ namespace bimsync.UI
     /// Interaction logic for ModelSelection.xaml
     /// </summary>
     public partial class ModelSelection : Window
-    {
+    {      
+
         public ObservableCollection<Project> ProjectsList { get; set; }
         public ObservableCollection<Model> ModelsList { get; set; }
         public string Comment { get; set; }
@@ -41,13 +44,22 @@ namespace bimsync.UI
             get { return _modelId; }
         }
 
+        private IFCExportConfiguration _configuration;
+        public IFCExportConfiguration Configuration
+        {
+            get { return _configuration; }
+        }
+
         private Document _doc;
+        private UIApplication _app;
+
         private string _access_token;
 
-        public ModelSelection(string access_token, Document doc)
+        public ModelSelection(string access_token, Document doc, UIApplication app )
         {
 
             _doc = doc;
+            _app = app;
             _access_token = access_token;
 
             InitializeComponent();
@@ -181,7 +193,40 @@ namespace bimsync.UI
             {
                 _modelId = selectedModel.id;
             }
-            
         }
+
+        private void Settings_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            IFCExportConfiguration selectedConfig = IFCExportConfiguration.CreateDefaultConfiguration();
+
+            IFCExportConfigurationsMap configurationsMap = new IFCExportConfigurationsMap();
+            configurationsMap.Add(IFCExportConfiguration.GetInSession());
+            configurationsMap.AddBuiltInConfigurations();
+            configurationsMap.AddSavedConfigurations();
+            configurationsMap.Add(selectedConfig);
+
+            ExportSettingsUI exportSettings = new ExportSettingsUI(configurationsMap, selectedConfig.Name);
+
+            if (exportSettings.ShowDialog() == true)
+            {
+                _configuration = exportSettings.Configuration;
+            }
+            
+
+        }
+
+        ///// <summary>
+        ///// Returns the selected configuration.
+        ///// </summary>
+        ///// <returns>The selected configuration.</returns>
+        //public IFCExportConfiguration GetSelectedConfiguration()
+        //{
+        //    //String selectedConfigName = (String)currentSelectedSetup.SelectedItem;
+        //    //if (selectedConfigName == null)
+        //    //    return null;
+
+        //    return m_configMap[selectedConfigName];
+        //}
     }
 }

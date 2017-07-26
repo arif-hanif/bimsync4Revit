@@ -9,6 +9,9 @@ using System.IO;
 using RestSharp;
 using System.Runtime.InteropServices;
 using System.Net;
+using System.Net.Sockets;
+using System.Diagnostics;
+using System.Security.Principal;
 
 namespace bimsync
 {
@@ -16,8 +19,8 @@ namespace bimsync
 
     public static class Services
     {
-        public const string client_id = "hl94XJLXaQe3ogX";
-        public const string client_secret = "ZbwjiwgwWHAwcBj";
+        public const string client_id = "0y7heCMCq1dDSoL";
+        public const string client_secret = "xFlgdmtRb9rsceu";
 
         // DLL imports from user32.dll to set focus to
         // Revit to force it to forward the external event
@@ -102,6 +105,45 @@ namespace bimsync
             {
                 return false;
             }
+        }
+
+        public static bool CheckForPortAvailability(string hostURI, int portNum)
+        {
+            try
+            {
+                using (TcpClient tcpClient = new TcpClient())
+                {
+                    tcpClient.Connect(hostURI, portNum);
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        //method stolen from an SO thread. sorry can't remember the author
+        //grant permissions to a particular URL, to run HttpListener in non-admin mode 
+        public static void AddAddress(string address, string domain, string user)
+        {
+            //netsh http add urlacl url=http://+:80/MyUri user=DOMAIN\user
+            string args = string.Format(@"http add urlacl url={0}", address) + " user=\"" + domain + "\\" + user + "\"";
+
+            ProcessStartInfo psi = new ProcessStartInfo("netsh", args);
+            psi.Verb = "runas";
+            psi.CreateNoWindow = true;
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            psi.UseShellExecute = true;
+
+            Process.Start(psi).WaitForExit();
+        }
+
+        public static bool IsAdministrator()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 

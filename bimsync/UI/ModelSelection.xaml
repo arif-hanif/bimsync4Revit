@@ -81,8 +81,11 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
+        <Button Grid.Row="2" Content="Settings" Name="Settings_Button"
+                    IsEnabled="True" HorizontalAlignment="Left" Margin="0" Click="Settings_Button_Click"/>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <!--<ProgressBar></ProgressBar>-->
+
             <Button Content="Upload" IsDefault="True" Name="Upload_Button"
                     IsEnabled="{Binding ElementName=commentTextBox,Path=Text.Length}" Click="Upload_Button_Click">
             </Button>

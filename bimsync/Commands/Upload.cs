@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using RestSharp;
+using BIM.IFC.Export.UI;
 #endregion
 
 namespace bimsync.Commands
@@ -39,7 +40,7 @@ namespace bimsync.Commands
                     string access_token = token.access_token;
 
                     //Load the interface to select these project and model
-                    UI.ModelSelection modelSelection = new UI.ModelSelection(access_token, doc);
+                    UI.ModelSelection modelSelection = new UI.ModelSelection(access_token, doc,uiapp);
 
                     if (modelSelection.ShowDialog() == true)
                     {
@@ -53,9 +54,9 @@ namespace bimsync.Commands
                         WriteOnParam("model_id", doc, modelSelection.ModelId);
 
                         //Export IFC
-                        ExportToIFC(doc);
+                        ExportToIFC(doc, modelSelection);
 
-                        UploadTobimsync(modelSelection,access_token);
+                        //UploadTobimsync(modelSelection,access_token);
 
                         tx.Commit();
 
@@ -90,14 +91,16 @@ namespace bimsync.Commands
             }
         }
 
-        public void ExportToIFC(Document doc)
+        public void ExportToIFC(Document doc, UI.ModelSelection modelSelection)
         {
-            //Export the project as IFC
+            // Prepare the export options
             IFCExportOptions IFCOptions = new IFCExportOptions();
-            IFCOptions.ExportBaseQuantities = true;
-            IFCOptions.FileVersion = IFCVersion.IFC2x3;
-            IFCOptions.WallAndColumnSplitting = true;
-            IFCOptions.SpaceBoundaryLevel = 1;
+
+            IFCExportConfiguration selectedConfig = modelSelection.Configuration;
+
+            ElementId activeViewId = GenerateActiveViewIdFromDocument(doc);
+            selectedConfig.ActiveViewId = selectedConfig.UseActiveViewGeometry ? activeViewId.IntegerValue : -1;
+            selectedConfig.UpdateOptions(IFCOptions, activeViewId);
 
             string folder = System.IO.Path.GetTempPath();
             string name = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + System.IO.Path.GetFileNameWithoutExtension(doc.PathName) + ".ifc";
@@ -200,6 +203,20 @@ namespace bimsync.Commands
                 {
                     p.Set(value);
                 }
+            }
+        }
+
+        private ElementId GenerateActiveViewIdFromDocument(Document doc)
+        {
+            try
+            {
+                Autodesk.Revit.DB.View activeView = doc.ActiveView;
+                ElementId activeViewId = (activeView == null) ? ElementId.InvalidElementId : activeView.Id;
+                return activeViewId;
+            }
+            catch
+            {
+                return ElementId.InvalidElementId;
             }
         }
     }

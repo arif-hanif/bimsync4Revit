@@ -39,6 +39,10 @@
     <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="IFCExportUI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\AddIns\IFCExporterUI\IFCExportUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -53,8 +57,15 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.XML" />
+    <Reference Include="UserInterfaceUtility">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\AddIns\IFCExporterUI\UserInterfaceUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +81,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services.cs" />
+    <Compile Include="UI\ExportSettingsUI.xaml.cs">
+      <DependentUpon>ExportSettingsUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ModelSelection.xaml.cs">
       <DependentUpon>ModelSelection.xaml</DependentUpon>
     </Compile>
@@ -111,6 +125,10 @@
     <None Include="Resources\bimsyncHelp_Files\jquery.raty.js.download" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UI\ExportSettingsUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ModelSelection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
