@@ -12,6 +12,7 @@ using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using RestSharp;
 using BIM.IFC.Export.UI;
+using System.IO.Compression;
 #endregion
 
 namespace bimsync.Commands
@@ -56,7 +57,11 @@ namespace bimsync.Commands
                         //Export IFC
                         ExportToIFC(doc, modelSelection);
 
-                        //UploadTobimsync(modelSelection,access_token);
+                        CompressFile();
+
+                        UploadTobimsync(modelSelection,access_token);
+
+                        File.Delete(_path);
 
                         tx.Commit();
 
@@ -108,6 +113,30 @@ namespace bimsync.Commands
             _path = Path.Combine(folder, name);
 
             doc.Export(folder, name, IFCOptions);
+        }
+
+        public void CompressFile()
+        {
+            //Create new directory
+            string directoryPath = Path.Combine(Path.GetDirectoryName(_path), Path.GetFileNameWithoutExtension(_path));
+            DirectoryInfo directoryInfo = Directory.CreateDirectory(directoryPath);
+
+            //copy IFC to this directory
+            string resultingPath = Path.Combine(directoryPath, Path.GetFileName(_path));
+            File.Move(_path, resultingPath);
+
+            string zipPath = Path.ChangeExtension(_path, "zip");
+            //string startPath = @"c:\example\start";
+            //string zipPath = @"c:\example\result.zip";
+            //string extractPath = @"c:\example\extract";
+            ZipFile.CreateFromDirectory(directoryPath, zipPath);
+
+            Directory.Delete(directoryPath,true);
+
+            //Update _path
+            _path = zipPath;
+            
+            //ZipFile.CreateFromDirectory(startPath, zipPath);
         }
 
         public void UploadTobimsync(UI.ModelSelection modelSelection, string access_token)

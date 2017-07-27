@@ -64,6 +64,8 @@ namespace bimsync.UI
 
             InitializeComponent();
 
+            _configuration = CreateDefaultConfiguration();
+
             //Create the lists
             ProjectsList = new ObservableCollection<Project>();
             ModelsList = new ObservableCollection<Model>();
@@ -198,22 +200,58 @@ namespace bimsync.UI
         private void Settings_Button_Click(object sender, RoutedEventArgs e)
         {
 
-            IFCExportConfiguration selectedConfig = IFCExportConfiguration.CreateDefaultConfiguration();
-
             IFCExportConfigurationsMap configurationsMap = new IFCExportConfigurationsMap();
             configurationsMap.Add(IFCExportConfiguration.GetInSession());
+            configurationsMap.Add(IFCExportConfiguration.CreateDefaultConfiguration());
             configurationsMap.AddBuiltInConfigurations();
             configurationsMap.AddSavedConfigurations();
-            configurationsMap.Add(selectedConfig);
+            if (!configurationsMap.Values.Contains(_configuration))
+            {
+                configurationsMap.Add(_configuration);
+            }
+            
 
-            ExportSettingsUI exportSettings = new ExportSettingsUI(configurationsMap, selectedConfig.Name);
+            ExportSettingsUI exportSettings = new ExportSettingsUI(configurationsMap, _configuration.Name);
 
             if (exportSettings.ShowDialog() == true)
             {
                 _configuration = exportSettings.Configuration;
             }
-            
+        }
 
+        private IFCExportConfiguration CreateDefaultConfiguration()
+        {
+            IFCExportConfiguration selectedConfig = IFCExportConfiguration.CreateDefaultConfiguration();
+
+            selectedConfig.Name = "<bimsync Setup>";
+            selectedConfig.IFCVersion = IFCVersion.IFC2x3CV2;
+            selectedConfig.SpaceBoundaries = 1;
+            selectedConfig.ActivePhaseId = ElementId.InvalidElementId;
+            selectedConfig.ExportBaseQuantities = true;
+            selectedConfig.SplitWallsAndColumns = true;
+            selectedConfig.VisibleElementsOfCurrentView = false;
+            selectedConfig.Use2DRoomBoundaryForVolume = false;
+            selectedConfig.UseFamilyAndTypeNameForReference = true;
+            selectedConfig.ExportInternalRevitPropertySets = true;
+            selectedConfig.ExportIFCCommonPropertySets = true;
+            selectedConfig.Export2DElements = false;
+            selectedConfig.ExportPartsAsBuildingElements = true;
+            selectedConfig.ExportBoundingBox = false;
+            selectedConfig.ExportSolidModelRep = false;
+            selectedConfig.ExportSchedulesAsPsets = false;
+            selectedConfig.ExportUserDefinedPsets = false;
+            selectedConfig.ExportUserDefinedPsetsFileName = "";
+            selectedConfig.ExportUserDefinedParameterMapping = false;
+            selectedConfig.ExportUserDefinedParameterMappingFileName = "";
+            selectedConfig.ExportLinkedFiles = false;
+            selectedConfig.IncludeSiteElevation = true;
+            selectedConfig.UseActiveViewGeometry = false;
+            selectedConfig.ExportSpecificSchedules = false;
+            selectedConfig.TessellationLevelOfDetail = 0;
+            selectedConfig.StoreIFCGUID = true;
+            selectedConfig.ExportRoomsInView = true;
+
+            return selectedConfig;
         }
 
         ///// <summary>
