@@ -25,12 +25,16 @@ namespace bimsync.Commands
 
             try
             {
-                Token token = AuthorizeApp();
-                Properties.Settings.Default["Token"] = token;
-                Properties.Settings.Default.Save();
+                //Token token = AuthorizeApp();
+                // A new handler to handle request posting by the dialog
+                ExternalEventAuthorizationHandler handler = new ExternalEventAuthorizationHandler();
 
-                UI.Ribbon.HideInitialPanel();
-                UI.Ribbon.ShowLoggedPanel();
+                // External Event for the dialog to use (to post requests)
+                ExternalEvent exEvent = ExternalEvent.Create(handler);
+
+                // We give the objects to the new dialog;
+                // The dialog becomes the owner responsible for disposing them, eventually.
+                ExternalEventAuthorization externalEventAuthorizationAnswer = new ExternalEventAuthorization(exEvent, handler);
 
                 return Result.Succeeded;
             }
@@ -43,72 +47,76 @@ namespace bimsync.Commands
             }
         }
 
-        public Token AuthorizeApp()
+
+    }
+
+    public class ExternalEventAuthorizationHandler : IExternalEventHandler
+    {
+        /// <summary>
+        /// A public property to access the current HttpListenerContext
+        /// </summary>
+        /// 
+        private HttpListenerContext context;
+        public HttpListenerContext Context
         {
-            Uri baseUrl = new Uri("https://api.bimsync.com");
+            get { return context; }
+            set { context = value; }
+        }
 
-            //Test for an internet connection
-            if (!Services.CheckForInternetConnection())
-            {
-                throw new Exception("Your computer seems to be currently offline. Please connect it to the internet and try again.");
-            }
+        /// <summary>
+        /// A public property to access the current HttpListener
+        /// </summary>
+        /// 
+        private HttpListener http;
+        public HttpListener Http
+        {
+            get { return http; }
+            set { http = value; }
+        }
 
+        /// <summary>
+        /// A public property to access the current Revit Handle
+        /// </summary>
+        /// 
+        private IntPtr revitWindow;
+        public IntPtr RevitWindow
+        {
+            get { return revitWindow; }
+            set { revitWindow = value; }
+        }
 
+        /// <summary>
+        /// A public property to set the redirect URI
+        /// </summary>
+        /// 
+        private string redirectURI;
+        public string RedirectURI
+        {
+            get { return redirectURI; }
+            set { redirectURI = value; }
+        }
 
-
-            //Get Revit windows handles
-            IntPtr revitWindow = Services.GetForegroundWindow();
-
-            int portNumber = 63842;
-
-            // Creates a redirect URI using an available port on the loopback address.
-            string redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, portNumber.ToString());// GetRandomUnusedPort());
-
-            //grant permissions to the redirectURI, to run HttpListener in non-admin mode
-            if (!Services.IsAdministrator())
-            {
-                Services.AddAddress(redirectURI, Environment.UserDomainName, Environment.UserName);
-            }
-
-            // Creates an HttpListener to listen for requests on that redirect URI.
-            HttpListener http = new HttpListener();
-            http.Prefixes.Add(redirectURI);
-
-            //Catch a specific error on the HttpListener
-            //https://stackoverflow.com/questions/4019466/httplistener-access-denied
+        public void Execute(UIApplication app)
+        {
             try
             {
-                http.Start();
+                AuthorizationAnswer();
             }
-            catch (HttpListenerException ex)
+            catch (Exception ex)
             {
-                throw new Exception("The application can't login without admin access right. " + ex.Message);
+                // unchecked exception cause command failed
+                string message = ex.Message;
+                TaskDialog.Show("bimsync Error", message);
             }
+        }
 
-            if (!Services.CheckForPortAvailability(IPAddress.Loopback.ToString(), portNumber))
-            {
-                http.Stop();
-                throw new Exception("It seems that the port N°63842 is closed or unavailable at the moment. " +
-                    "The URL " + redirectURI + " cannot be reached. " +
-                    "The application could not connect to the bimsync server. Contact your system administrator.");
-            }
+        public string GetName()
+        {
+            return "bimsync Login";
+        }
 
-            // Creates the OAuth 2.0 authorization request.
-            string authorizationRequest = string.Format("{0}/oauth2/authorize?response_type=code&redirect_uri={1}&client_id={2}&state={3}",
-                                                        baseUrl.OriginalString,
-                                                        System.Uri.EscapeDataString(redirectURI),
-                                                        bimsync.Services.client_id,
-                                                        "1");
-
-            // Opens request in the browser.
-            Process browserProcess = Process.Start(authorizationRequest);
-
-            //Get the browser in front
-            Services.SetForegroundWindow(browserProcess.MainWindowHandle);
-
-            // Waits for the OAuth authorization response.
-            HttpListenerContext context = http.GetContext();
-
+        private void AuthorizationAnswer()
+        {
             System.Threading.Thread.Sleep(200);
 
             // Brings Revit back to the foreground.
@@ -173,9 +181,127 @@ namespace bimsync.Commands
                 throw new Exception(message);
             }
 
-            return responseToken.Data;
+            Token token = responseToken.Data;
+
+            Properties.Settings.Default["Token"] = token;
+            Properties.Settings.Default.Save();
+
+            UI.Ribbon.HideInitialPanel();
+            UI.Ribbon.ShowLoggedPanel();
+        }
+
+    }
+
+    public partial class ExternalEventAuthorization
+    {
+        private ExternalEvent m_ExEvent;
+        private ExternalEventAuthorizationHandler m_Handler;
+
+        private HttpListener http;
+        private IntPtr revitWindow;
+        private string redirectURI;
+
+        public ExternalEventAuthorization(ExternalEvent exEvent, ExternalEventAuthorizationHandler handler)
+        {
+            m_ExEvent = exEvent;
+            m_Handler = handler;
+
+            AuthorizeApp();
+
+            AuthorizationAnswer();
+        }
+
+        private void AuthorizeApp()
+        {
+            Uri baseUrl = new Uri("https://api.bimsync.com");
+
+            //Test for an internet connection
+            if (!Services.CheckForInternetConnection())
+            {
+                throw new Exception("Your computer seems to be currently offline. Please connect it to the internet and try again.");
+            }
+
+            //Get Revit windows handles
+            revitWindow = Services.GetForegroundWindow();
+            m_Handler.RevitWindow = revitWindow;
+
+            int portNumber = 63842;
+
+            // Creates a redirect URI using an available port on the loopback address.
+            redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, portNumber.ToString());// GetRandomUnusedPort());
+            m_Handler.RedirectURI = redirectURI;
+
+            //grant permissions to the redirectURI, to run HttpListener in non-admin mode
+            if (!Services.IsAdministrator())
+            {
+                Services.AddAddress(redirectURI, Environment.UserDomainName, Environment.UserName);
+            }
+
+            // Creates an HttpListener to listen for requests on that redirect URI.
+            if (http != null)
+            {
+                if (http.IsListening)
+                {
+                    http.Stop();
+                }
+            }
+
+            http = new HttpListener();
+            http.Prefixes.Add(redirectURI);
+
+            //Catch a specific error on the HttpListener
+            //https://stackoverflow.com/questions/4019466/httplistener-access-denied
+            try
+            {
+                http.Start();
+            }
+            catch (HttpListenerException ex)
+            {
+                if (ex.ErrorCode == 183)
+                {
+                    throw new Exception("Something went wrong with the login process. Please restart Revit before trying again.");
+                }
+
+                throw new Exception("The application can't login without admin access right. " + ex.Message);
+            }
+
+            if (!Services.CheckForPortAvailability(IPAddress.Loopback.ToString(), portNumber))
+            {
+                http.Stop();
+                throw new Exception("It seems that the port N°63842 is closed or unavailable at the moment. " +
+                    "The URL " + redirectURI + " cannot be reached. " +
+                    "The application could not connect to the bimsync server. Contact your system administrator.");
+            }
+
+            // Creates the OAuth 2.0 authorization request.
+            string authorizationRequest = string.Format("{0}/oauth2/authorize?response_type=code&redirect_uri={1}&client_id={2}&state={3}",
+                                                        baseUrl.OriginalString,
+                                                        System.Uri.EscapeDataString(redirectURI),
+                                                        bimsync.Services.client_id,
+                                                        "1");
+
+            // Opens request in the browser.
+            Process browserProcess = Process.Start(authorizationRequest);
+
+            //Get the browser in front
+            Services.SetForegroundWindow(browserProcess.MainWindowHandle);
+
+            m_Handler.Http = http;
+
+        }
+
+        private async void AuthorizationAnswer()
+        {
+            // Waits for the OAuth authorization response.
+            //System.Threading.Tasks.Task<HttpListenerContext> 
+            HttpListenerContext context = await http.GetContextAsync();
+
+            m_Handler.Context = context;
+
+            m_ExEvent.Raise();
         }
 
 
     }
+
 }

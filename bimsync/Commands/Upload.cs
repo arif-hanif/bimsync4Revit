@@ -157,8 +157,13 @@ namespace bimsync.Commands
             byte[] data = File.ReadAllBytes(_path);
             revisionRequest.AddParameter("application/ifc", data, RestSharp.ParameterType.RequestBody);
 
-            var reponsetest = client.Execute(revisionRequest);
-            //
+            IRestResponse reponseUpload = client.Execute(revisionRequest);
+
+            if (reponseUpload.ErrorException != null)
+            {
+                string message = "Opps! There has been an error while uploading your model. " + reponseUpload.ErrorException.Message;
+                throw new Exception(message);
+            }
         }
 
         private void AddSharedParameters(Application app, Document doc)

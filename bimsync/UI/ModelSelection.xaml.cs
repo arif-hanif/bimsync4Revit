@@ -31,6 +31,7 @@ namespace bimsync.UI
         public ObservableCollection<Project> ProjectsList { get; set; }
         public ObservableCollection<Model> ModelsList { get; set; }
         public string Comment { get; set; }
+        public ObservableCollection<IFCExportConfiguration> IFCExportConfigurationList { get; set; }
 
         private string _projectId;
         public string ProjectId
@@ -64,14 +65,14 @@ namespace bimsync.UI
 
             InitializeComponent();
 
-            _configuration = CreateDefaultConfiguration();
-
             //Create the lists
             ProjectsList = new ObservableCollection<Project>();
             ModelsList = new ObservableCollection<Model>();
+            IFCExportConfigurationList = new ObservableCollection<IFCExportConfiguration>();
 
             GetUserProjects();
             GetUserModels();
+            GetUserIFCExportConfiguration();
 
             this.DataContext = this;
         }
@@ -148,6 +149,27 @@ namespace bimsync.UI
             }
         }
 
+        private void GetUserIFCExportConfiguration()
+        {
+            IFCExportConfigurationsMap configurationsMap = new IFCExportConfigurationsMap();
+            configurationsMap.Add(CreateDefaultbimsyncConfiguration());
+            configurationsMap.Add(IFCExportConfiguration.CreateDefaultConfiguration());
+            configurationsMap.Add(IFCExportConfiguration.GetInSession());
+            configurationsMap.AddBuiltInConfigurations();
+            configurationsMap.AddSavedConfigurations();
+            
+
+
+            IFCExportConfigurationList.Clear();
+            foreach (IFCExportConfiguration IFCExportConfiguration in configurationsMap.Values)
+            {
+                IFCExportConfigurationList.Add(IFCExportConfiguration);
+            }
+
+            _configuration = IFCExportConfigurationList.FirstOrDefault();
+            IFCExportConfigurationCombobox.SelectedItem = _configuration;
+        }
+
         private string GetValueOrDefault(string parameterName)
         {
             ProjectInfo projectInfoElement = _doc.ProjectInformation;
@@ -176,6 +198,7 @@ namespace bimsync.UI
 
         private void Upload_Button_Click(object sender, RoutedEventArgs e)
         {
+            _configuration = IFCExportConfigurationCombobox.SelectedItem as IFCExportConfiguration;
             Comment = commentTextBox.Text;
             this.DialogResult = true;
             this.Close();
@@ -197,29 +220,29 @@ namespace bimsync.UI
             }
         }
 
-        private void Settings_Button_Click(object sender, RoutedEventArgs e)
+        private void IFCExportConfigurationCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-            IFCExportConfigurationsMap configurationsMap = new IFCExportConfigurationsMap();
-            configurationsMap.Add(IFCExportConfiguration.GetInSession());
-            configurationsMap.Add(IFCExportConfiguration.CreateDefaultConfiguration());
-            configurationsMap.AddBuiltInConfigurations();
-            configurationsMap.AddSavedConfigurations();
-            if (!configurationsMap.Values.Contains(_configuration))
+            IFCExportConfiguration selectedConfiguration = IFCExportConfigurationCombobox.SelectedItem as IFCExportConfiguration;
+            if (Enum.GetName(typeof(IFCVersion), selectedConfiguration.IFCVersion).Contains("IFC4"))
+            /*== IFCVersion.IFC4 || 
+            selectedConfiguration.IFCVersion == IFCVersion.IFC4DTV ||
+            selectedConfiguration.IFCVersion == IFCVersion.IFC4RV)*/
             {
-                configurationsMap.Add(_configuration);
+                info.Content = "bimsync does not support IFC 4, please select another setup.";
+                info.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("Red"));
             }
-            
-
-            ExportSettingsUI exportSettings = new ExportSettingsUI(configurationsMap, _configuration.Name);
-
-            if (exportSettings.ShowDialog() == true)
+            else
             {
-                _configuration = exportSettings.Configuration;
+                info.Content = "To create a new setup, please use the IFC Export interface.";
+                info.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("Black"));
             }
+
+            //To create a new setup, please use the IFC Export interface.
+            //bimsync does not support IFC 4, please select another setup
+
         }
 
-        private IFCExportConfiguration CreateDefaultConfiguration()
+        private IFCExportConfiguration CreateDefaultbimsyncConfiguration()
         {
             IFCExportConfiguration selectedConfig = IFCExportConfiguration.CreateDefaultConfiguration();
 
@@ -228,7 +251,7 @@ namespace bimsync.UI
             selectedConfig.SpaceBoundaries = 1;
             selectedConfig.ActivePhaseId = ElementId.InvalidElementId;
             selectedConfig.ExportBaseQuantities = true;
-            selectedConfig.SplitWallsAndColumns = true;
+            selectedConfig.SplitWallsAndColumns = false;
             selectedConfig.VisibleElementsOfCurrentView = false;
             selectedConfig.Use2DRoomBoundaryForVolume = false;
             selectedConfig.UseFamilyAndTypeNameForReference = true;
@@ -241,8 +264,6 @@ namespace bimsync.UI
             selectedConfig.ExportSchedulesAsPsets = false;
             selectedConfig.ExportUserDefinedPsets = false;
             selectedConfig.ExportUserDefinedPsetsFileName = "";
-            selectedConfig.ExportUserDefinedParameterMapping = false;
-            selectedConfig.ExportUserDefinedParameterMappingFileName = "";
             selectedConfig.ExportLinkedFiles = false;
             selectedConfig.IncludeSiteElevation = true;
             selectedConfig.UseActiveViewGeometry = false;
@@ -254,17 +275,6 @@ namespace bimsync.UI
             return selectedConfig;
         }
 
-        ///// <summary>
-        ///// Returns the selected configuration.
-        ///// </summary>
-        ///// <returns>The selected configuration.</returns>
-        //public IFCExportConfiguration GetSelectedConfiguration()
-        //{
-        //    //String selectedConfigName = (String)currentSelectedSetup.SelectedItem;
-        //    //if (selectedConfigName == null)
-        //    //    return null;
 
-        //    return m_configMap[selectedConfigName];
-        //}
     }
 }

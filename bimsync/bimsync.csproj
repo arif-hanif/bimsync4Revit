@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
+    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2016\Revit.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,12 +36,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2018\Revit.exe</StartProgram>
+    <StartProgram>$(ProgramW6432)\Autodesk\Revit 2016\Revit.exe</StartProgram>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IFCExportUI">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\AddIns\IFCExporterUI\IFCExportUI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="IFCExportUIOverride">
+      <HintPath>..\files\IFCExportUIOverride.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -49,11 +48,11 @@
       <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <HintPath>$(ProgramW6432)\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI">
-      <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <HintPath>$(ProgramW6432)\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -63,10 +62,6 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.XML" />
-    <Reference Include="UserInterfaceUtility">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\AddIns\IFCExporterUI\UserInterfaceUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -82,9 +77,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services.cs" />
-    <Compile Include="UI\ExportSettingsUI.xaml.cs">
-      <DependentUpon>ExportSettingsUI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\ModelSelection.xaml.cs">
       <DependentUpon>ModelSelection.xaml</DependentUpon>
     </Compile>
@@ -95,8 +87,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Resources\bimsyncHelp_Files\appstore-combined.min.css" />
-    <Content Include="Resources\bimsyncHelp_Files\original_72d21fcd-c4f4-4d42-9c96-ae5173d94acb_.gif" />
-    <Content Include="Resources\bimsyncHelp_Files\original_f5b77168-b7fd-451c-857d-862fe3d5edc0_.gif" />
+    <Content Include="Resources\bimsyncHelp_Files\original_1456c10f-b94a-4396-bc0d-74f45ae5edba_.gif" />
+    <Content Include="Resources\bimsyncHelp_Files\original_32685b71-1823-4bbd-9f8e-63deb5cd1ea8_.gif" />
     <Content Include="Resources\bimsyncHelp_Files\resized_624379e1-4bac-467d-bf1a-a1241a0fbccd_.png" />
     <Content Include="Resources\bimsyncHelp_Files\totop50.png" />
     <EmbeddedResource Include="Resources\bimsyncSharedParameter.txt" />
@@ -126,10 +118,6 @@
     <None Include="Resources\bimsyncHelp_Files\jquery.raty.js.download" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\ExportSettingsUI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\ModelSelection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -138,12 +126,12 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if exist "$(AppData)\Autodesk\REVIT\Addins\2018" copy "$(ProjectDir)*.addin" "$(AppData)\Autodesk\REVIT\Addins\2018"
-if exist "$(AppData)\Autodesk\REVIT\Addins\2018" copy "$(ProjectDir)$(OutputPath)*.dll" "$(AppData)\Autodesk\REVIT\Addins\2018"
+    <PostBuildEvent>if exist "$(AppData)\Autodesk\REVIT\Addins\2016" copy "$(ProjectDir)*.addin" "$(AppData)\Autodesk\REVIT\Addins\2016"
+if exist "$(AppData)\Autodesk\REVIT\Addins\2016" copy "$(ProjectDir)$(OutputPath)*.dll" "$(AppData)\Autodesk\REVIT\Addins\2016"
 
-copy "$(ProjectDir)Resources\bimsyncHelp.html" "$(AppData)\Autodesk\REVIT\Addins\2018"
-mkdir "$(AppData)\Autodesk\REVIT\Addins\2018\bimsyncHelp_Files"
-copy "$(ProjectDir)Resources\bimsyncHelp_Files" "$(AppData)\Autodesk\REVIT\Addins\2018\bimsyncHelp_Files"</PostBuildEvent>
+copy "$(ProjectDir)Resources\bimsyncHelp.html" "$(AppData)\Autodesk\REVIT\Addins\2016"
+mkdir "$(AppData)\Autodesk\REVIT\Addins\2016\bimsyncHelp_Files"
+copy "$(ProjectDir)Resources\bimsyncHelp_Files" "$(AppData)\Autodesk\REVIT\Addins\2016\bimsyncHelp_Files"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -153,7 +141,7 @@ copy "$(ProjectDir)Resources\bimsyncHelp_Files" "$(AppData)\Autodesk\REVIT\Addin
   </Target>
   -->
   <Target Name="AfterClean">
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2018\bimsync.addin" />
-    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2018\bimsync.dll" />
+    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2016\bimsync.addin" />
+    <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2016\bimsync.dll" />
   </Target>
 </Project>

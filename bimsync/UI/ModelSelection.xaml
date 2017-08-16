@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Height="208.604" Width="351.053" 
+             mc:Ignorable="d" Height="230" Width="400" 
         Title="Model Selection" >
     <Window.Resources>
         <Style>
@@ -32,6 +32,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" Grid.Row="0">
@@ -81,9 +82,17 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
-        <Button Grid.Row="2" Content="Settings" Name="Settings_Button"
-                    IsEnabled="True" HorizontalAlignment="Left" Margin="0" Click="Settings_Button_Click"/>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+        <Label Name="info" Grid.Row="2">To create a new setup, please use the IFC Export interface.</Label>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <Label>Setup:</Label>
+            <ComboBox Name="IFCExportConfigurationCombobox" Width="150"
+                      DisplayMemberPath="Name"
+                      ItemsSource="{Binding Path=IFCExportConfigurationList}"
+                      SelectionChanged="IFCExportConfigurationCombobox_SelectionChanged"/>
+            <!--<Button Content="Settings" Name="Settings_Button"
+                    IsEnabled="True" Click="Settings_Button_Click"/>-->
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <!--<ProgressBar></ProgressBar>-->
 
             <Button Content="Upload" IsDefault="True" Name="Upload_Button"
