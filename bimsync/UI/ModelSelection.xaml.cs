@@ -1,4 +1,6 @@
 ﻿#region Namespaces
+extern alias IFCExportUIOverride;
+extern alias IFCExportUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,6 @@ using System.Windows.Shapes;
 using RestSharp;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using BIM.IFC.Export.UI;
 #endregion
 
 namespace bimsync.UI
@@ -31,7 +32,7 @@ namespace bimsync.UI
         public ObservableCollection<Project> ProjectsList { get; set; }
         public ObservableCollection<Model> ModelsList { get; set; }
         public string Comment { get; set; }
-        public ObservableCollection<IFCExportConfiguration> IFCExportConfigurationList { get; set; }
+        public ObservableCollection<IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration> IFCExportConfigurationList { get; set; }
 
         private string _projectId;
         public string ProjectId
@@ -45,8 +46,8 @@ namespace bimsync.UI
             get { return _modelId; }
         }
 
-        private IFCExportConfiguration _configuration;
-        public IFCExportConfiguration Configuration
+        private IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration _configuration;
+        public IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration Configuration
         {
             get { return _configuration; }
         }
@@ -68,11 +69,27 @@ namespace bimsync.UI
             //Create the lists
             ProjectsList = new ObservableCollection<Project>();
             ModelsList = new ObservableCollection<Model>();
-            IFCExportConfigurationList = new ObservableCollection<IFCExportConfiguration>();
+            IFCExportConfigurationList = new ObservableCollection<IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration>();
 
             GetUserProjects();
             GetUserModels();
-            GetUserIFCExportConfiguration();
+            try
+            {
+                GetUserIFCExportConfigurationOverrided();
+            }
+            catch (System.IO.FileNotFoundException ex)
+            {
+                string message = ex.Message;
+                if (message.Contains("IFCExportUIOverride"))
+                {
+                    GetUserIFCExportConfigurationStandard();
+                }
+                else
+                {
+                    throw ex;
+                }
+            }
+            
 
             this.DataContext = this;
         }
@@ -149,21 +166,43 @@ namespace bimsync.UI
             }
         }
 
-        private void GetUserIFCExportConfiguration()
+        private void GetUserIFCExportConfigurationStandard()
         {
-            IFCExportConfigurationsMap configurationsMap = new IFCExportConfigurationsMap();
+            //IFCExportUI::BIM.IFC.Export.UI.
+
+            IFCExportUI::BIM.IFC.Export.UI.IFCExportConfigurationsMap configurationsMap = new IFCExportUI::BIM.IFC.Export.UI.IFCExportConfigurationsMap();
             configurationsMap.Add(CreateDefaultbimsyncConfiguration());
-            configurationsMap.Add(IFCExportConfiguration.CreateDefaultConfiguration());
-            configurationsMap.Add(IFCExportConfiguration.GetInSession());
+            configurationsMap.Add(IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration.CreateDefaultConfiguration());
+            configurationsMap.Add(IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration.GetInSession());
             configurationsMap.AddBuiltInConfigurations();
             configurationsMap.AddSavedConfigurations();
             
-
-
             IFCExportConfigurationList.Clear();
-            foreach (IFCExportConfiguration IFCExportConfiguration in configurationsMap.Values)
+            foreach (IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration IFCExportConfiguration in configurationsMap.Values)
             {
                 IFCExportConfigurationList.Add(IFCExportConfiguration);
+            }
+
+            _configuration = IFCExportConfigurationList.FirstOrDefault();
+            IFCExportConfigurationCombobox.SelectedItem = _configuration;
+        }
+
+        private void GetUserIFCExportConfigurationOverrided()
+        {
+            //IFCExportUIOverride::BIM.IFC.Export.UI.
+
+            IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfigurationsMap configurationsMap = new IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfigurationsMap();
+            configurationsMap.Add(CreateOverrridedbimsyncConfiguration());
+            configurationsMap.Add(IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration.CreateDefaultConfiguration());
+            configurationsMap.Add(IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration.GetInSession());
+            configurationsMap.AddBuiltInConfigurations();
+            configurationsMap.AddSavedConfigurations();
+
+            IFCExportConfigurationList.Clear();
+            foreach (IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration IFCExportConfiguration in configurationsMap.Values)
+            {
+                IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration standartConfig = CreateStandardConfiguration(IFCExportConfiguration);
+                IFCExportConfigurationList.Add(standartConfig);
             }
 
             _configuration = IFCExportConfigurationList.FirstOrDefault();
@@ -198,7 +237,7 @@ namespace bimsync.UI
 
         private void Upload_Button_Click(object sender, RoutedEventArgs e)
         {
-            _configuration = IFCExportConfigurationCombobox.SelectedItem as IFCExportConfiguration;
+            _configuration = IFCExportConfigurationCombobox.SelectedItem as IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration;
             Comment = commentTextBox.Text;
             this.DialogResult = true;
             this.Close();
@@ -222,8 +261,13 @@ namespace bimsync.UI
 
         private void IFCExportConfigurationCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            IFCExportConfiguration selectedConfiguration = IFCExportConfigurationCombobox.SelectedItem as IFCExportConfiguration;
-            if (Enum.GetName(typeof(IFCVersion), selectedConfiguration.IFCVersion).Contains("IFC4"))
+            IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration selectedConfiguration = IFCExportConfigurationCombobox.SelectedItem as IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration;
+            if (Enum.GetName(typeof(IFCVersion), selectedConfiguration.IFCVersion) == null)
+            {
+                info.Content = "This configuration is not supported by your version of Revit, please select another setup.";
+                info.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("Red"));
+            }
+            else if (Enum.GetName(typeof(IFCVersion), selectedConfiguration.IFCVersion).Contains("IFC4"))
             /*== IFCVersion.IFC4 || 
             selectedConfiguration.IFCVersion == IFCVersion.IFC4DTV ||
             selectedConfiguration.IFCVersion == IFCVersion.IFC4RV)*/
@@ -242,9 +286,66 @@ namespace bimsync.UI
 
         }
 
-        private IFCExportConfiguration CreateDefaultbimsyncConfiguration()
+        private IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration CreateStandardConfiguration(IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration overridedConfiguration)
         {
-            IFCExportConfiguration selectedConfig = IFCExportConfiguration.CreateDefaultConfiguration();
+            IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration standardConfig = IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration.CreateDefaultConfiguration();
+
+            //Copy the custom config into a stand one
+            System.Reflection.PropertyInfo[] sourcePropertyInfos = overridedConfiguration.GetType().GetProperties();
+            foreach (System.Reflection.PropertyInfo sourcePropertyInfo in sourcePropertyInfos)
+            {
+                var sourcePropertyValue = sourcePropertyInfo.GetValue(overridedConfiguration);
+                var outputPropertyInfo = standardConfig.GetType().GetProperty(sourcePropertyInfo.Name);
+                if (outputPropertyInfo != null)
+                {
+                    Type t = Nullable.GetUnderlyingType(outputPropertyInfo.PropertyType) ?? outputPropertyInfo.PropertyType;
+                    object safeValue = (sourcePropertyValue == null) ? null : Convert.ChangeType(sourcePropertyValue, t);
+                    if (outputPropertyInfo.CanWrite)
+                    {
+                        outputPropertyInfo.SetValue(standardConfig, safeValue);
+                    }
+                }
+            }
+
+            return standardConfig;
+        }
+
+        private IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration CreateDefaultbimsyncConfiguration()
+        {
+            IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration selectedConfig = IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration.CreateDefaultConfiguration();
+
+            selectedConfig.Name = "<bimsync Setup>";
+            selectedConfig.IFCVersion = IFCVersion.IFC2x3CV2;
+            selectedConfig.SpaceBoundaries = 1;
+            selectedConfig.ActivePhaseId = ElementId.InvalidElementId;
+            selectedConfig.ExportBaseQuantities = true;
+            selectedConfig.SplitWallsAndColumns = false;
+            selectedConfig.VisibleElementsOfCurrentView = false;
+            selectedConfig.Use2DRoomBoundaryForVolume = false;
+            selectedConfig.UseFamilyAndTypeNameForReference = true;
+            selectedConfig.ExportInternalRevitPropertySets = true;
+            selectedConfig.ExportIFCCommonPropertySets = true;
+            selectedConfig.Export2DElements = false;
+            selectedConfig.ExportPartsAsBuildingElements = true;
+            selectedConfig.ExportBoundingBox = false;
+            selectedConfig.ExportSolidModelRep = false;
+            selectedConfig.ExportSchedulesAsPsets = false;
+            selectedConfig.ExportUserDefinedPsets = false;
+            selectedConfig.ExportUserDefinedPsetsFileName = "";
+            selectedConfig.ExportLinkedFiles = false;
+            selectedConfig.IncludeSiteElevation = true;
+            selectedConfig.UseActiveViewGeometry = false;
+            selectedConfig.ExportSpecificSchedules = false;
+            selectedConfig.TessellationLevelOfDetail = 0;
+            selectedConfig.StoreIFCGUID = true;
+            selectedConfig.ExportRoomsInView = true;
+
+            return selectedConfig;
+        }
+
+        private IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration CreateOverrridedbimsyncConfiguration()
+        {
+            IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration selectedConfig = IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration.CreateDefaultConfiguration();
 
             selectedConfig.Name = "<bimsync Setup>";
             selectedConfig.IFCVersion = IFCVersion.IFC2x3CV2;

@@ -288,7 +288,7 @@ namespace bimsync.Commands
 
             m_Handler.Http = http;
 
-        }
+        }   
 
         private async void AuthorizationAnswer()
         {

@@ -64,6 +64,7 @@ namespace bimsync
             catch (Exception ex)
             {
                 // Return Failure
+                TaskDialog.Show("bimsync Error", ex.Message);
                 return Result.Failed;
             }
         }

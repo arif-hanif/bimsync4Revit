@@ -11,7 +11,6 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using RestSharp;
-using BIM.IFC.Export.UI;
 using System.IO.Compression;
 #endregion
 
@@ -41,7 +40,7 @@ namespace bimsync.Commands
                     string access_token = token.access_token;
 
                     //Load the interface to select these project and model
-                    UI.ModelSelection modelSelection = new UI.ModelSelection(access_token, doc,uiapp);
+                    UI.ModelSelection modelSelection = new UI.ModelSelection(access_token, doc, uiapp);
 
                     if (modelSelection.ShowDialog() == true)
                     {
@@ -101,7 +100,7 @@ namespace bimsync.Commands
             // Prepare the export options
             IFCExportOptions IFCOptions = new IFCExportOptions();
 
-            IFCExportConfiguration selectedConfig = modelSelection.Configuration;
+            dynamic selectedConfig = modelSelection.Configuration;
 
             ElementId activeViewId = GenerateActiveViewIdFromDocument(doc);
             selectedConfig.ActiveViewId = selectedConfig.UseActiveViewGeometry ? activeViewId.IntegerValue : -1;
