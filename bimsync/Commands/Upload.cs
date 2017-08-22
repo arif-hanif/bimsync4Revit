@@ -100,7 +100,7 @@ namespace bimsync.Commands
             // Prepare the export options
             IFCExportOptions IFCOptions = new IFCExportOptions();
 
-            dynamic selectedConfig = modelSelection.Configuration;
+            UI.IFCExportConfigurationCustom selectedConfig = modelSelection.Configuration;
 
             ElementId activeViewId = GenerateActiveViewIdFromDocument(doc);
             selectedConfig.ActiveViewId = selectedConfig.UseActiveViewGeometry ? activeViewId.IntegerValue : -1;
