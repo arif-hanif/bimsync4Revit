@@ -14,13 +14,18 @@ namespace bimsync.UI
     {
         public IFCExportConfigurationCustom(IFCLibrary ifcLibrary, object ifcExportConfiguration)
         {
-            if (ifcLibrary == IFCLibrary.Standard)
+            _IFCLibrary = ifcLibrary;
+            if (_IFCLibrary == IFCLibrary.Standard)
             {
                 IFCExportConfigurationCustomStandard(ifcExportConfiguration);
             }
-            else if (ifcLibrary == IFCLibrary.Override)
+            else if (_IFCLibrary == IFCLibrary.Override)
             {
                 IFCExportConfigurationCustomOvverided(ifcExportConfiguration);
+            }
+            else if (_IFCLibrary == IFCLibrary.Deprecated)
+            {
+                IFCExportConfigurationCustomDeprecated(ifcExportConfiguration);
             }
         }
 
@@ -34,7 +39,7 @@ namespace bimsync.UI
             _UseActiveViewGeometry = config.UseActiveViewGeometry;
         }
 
-        public void IFCExportConfigurationCustomOvverided(object ifcExportConfiguration)
+        private void IFCExportConfigurationCustomOvverided(object ifcExportConfiguration)
         {
             IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration config = (IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration)ifcExportConfiguration;
             _IFCExportConfiguration = config;
@@ -43,6 +48,18 @@ namespace bimsync.UI
             _ActiveViewId = config.ActiveViewId;
             _UseActiveViewGeometry = config.UseActiveViewGeometry;
         }
+
+        private void IFCExportConfigurationCustomDeprecated(object ifcExportConfiguration)
+        {
+            IFCExportConfigurationDeprecated config = (IFCExportConfigurationDeprecated)ifcExportConfiguration;
+            _IFCExportConfiguration = config;
+            _IFCVersion = config.IFCVersion;
+            _Name = config.Name;
+            _ActiveViewId = config.ActiveViewId;
+            _UseActiveViewGeometry = config.CurrentViewOnly;
+        }
+
+        private IFCLibrary _IFCLibrary;
 
         private IFCVersion _IFCVersion;
         public IFCVersion IFCVersion
@@ -77,21 +94,42 @@ namespace bimsync.UI
 
         public void UpdateOptions(IFCExportOptions IFCOptions, ElementId activeViewId)
         {
-            if ((IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration)_IFCExportConfiguration != null)
+            if (_IFCLibrary == IFCLibrary.Standard)
             {
-                IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration config = _IFCExportConfiguration as IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration;
-                config.UpdateOptions(IFCOptions, activeViewId);
+                UpdateOptionStandard(IFCOptions,activeViewId);
             }
-            else if ((IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration)_IFCExportConfiguration != null)
+            else if (_IFCLibrary == IFCLibrary.Override)
             {
-                IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration config = _IFCExportConfiguration as IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration;
-                config.UpdateOptions(IFCOptions, activeViewId);
+                UpdateOptionOverrided(IFCOptions, activeViewId);
             }
-
+            else if (_IFCLibrary == IFCLibrary.Deprecated)
+            {
+                UpdateOptionDeprecated(IFCOptions, activeViewId);
+            }
         }
 
+        private void UpdateOptionStandard(IFCExportOptions IFCOptions, ElementId activeViewId)
+        {
+            IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration config = _IFCExportConfiguration as IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration;
+            config.UpdateOptions(IFCOptions, activeViewId);
+        }
 
+        private void UpdateOptionOverrided(IFCExportOptions IFCOptions, ElementId activeViewId)
+        {
+            IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration config = _IFCExportConfiguration as IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration;
+            config.UpdateOptions(IFCOptions, activeViewId);
+        }
 
+        private void UpdateOptionDeprecated(IFCExportOptions IFCOptions, ElementId activeViewId)
+        {
+            IFCExportConfigurationDeprecated config = _IFCExportConfiguration as IFCExportConfigurationDeprecated;
+
+            IFCOptions.ExportBaseQuantities = config.ExportBaseQuantities;
+            IFCOptions.FileVersion = config.IFCVersion;
+            if (config.CurrentViewOnly) { IFCOptions.FilterViewId = activeViewId; }
+            IFCOptions.SpaceBoundaryLevel = 1;
+            IFCOptions.WallAndColumnSplitting = config.SplitWall;
+        }
     }
 
     public class IFCExportConfigurationsMapCustom
@@ -102,6 +140,7 @@ namespace bimsync.UI
 
             try
             {
+                //Try the overrided UI. This should works in 2016, 2017 and 2018 when the custom IFC exporter is here
                 GetUserIFCExportConfigurationOverrided();
             }
             catch (System.IO.FileNotFoundException ex)
@@ -109,7 +148,25 @@ namespace bimsync.UI
                 string message = ex.Message;
                 if (message.Contains("IFCExportUIOverride"))
                 {
-                    GetUserIFCExportConfigurationStandard();
+                    try
+                    {
+                        //Try the standard UI. This should always works in 2017 and 2018
+                        GetUserIFCExportConfigurationStandard();
+                    }
+                    catch (System.IO.FileNotFoundException exDeprecated)
+                    {
+                        string messageOld = exDeprecated.Message;
+                        if (message.Contains("IFCExportUI"))
+                        {
+                            //Try this for Revit 2016 without the custom IFC Exporter
+                            GetUserIFCExportConfigurationDeprecated();
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
+                    
                 }
                 else
                 {
@@ -156,6 +213,39 @@ namespace bimsync.UI
             {
                 _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Override, config));
             }
+        }
+
+        private void GetUserIFCExportConfigurationDeprecated()
+        {
+            
+            //Loop on all possibilities here
+            IFCExportConfigurationDeprecated config = new IFCExportConfigurationDeprecated(false, false, true);
+            config.Name = "<bimsync Config>";
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(false, false, false);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(false, false, true);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(false, true, true);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(false, true, false);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(true, false, true);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(true, false, false);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(true, true, true);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
+
+            config = new IFCExportConfigurationDeprecated(true, true, false);
+            _Values.Add(new IFCExportConfigurationCustom(IFCLibrary.Deprecated, config));
         }
 
         //private IFCExportUI::BIM.IFC.Export.UI.IFCExportConfiguration CreateStandardConfiguration(IFCExportUIOverride::BIM.IFC.Export.UI.IFCExportConfiguration overridedConfiguration)
@@ -249,6 +339,31 @@ namespace bimsync.UI
         }
 
 
+    }
+
+    public class IFCExportConfigurationDeprecated
+    {
+        public IFCExportConfigurationDeprecated(
+            bool currentViewOnly,
+            bool splitWall,
+            bool exportBaseQuantities)
+        {
+            CurrentViewOnly = currentViewOnly;
+            SplitWall = splitWall;
+            ExportBaseQuantities = exportBaseQuantities;
+            Name = String.Format("IFC 2x3{0}{1}{2}", 
+                CurrentViewOnly ? "-Current View" : "",
+                SplitWall ? "-Split Wall" : "",
+                ExportBaseQuantities ? "-Base Quantities" : "");
+            IFCVersion = IFCVersion.IFC2x3;
+        }
+
+        public bool CurrentViewOnly { get; set; }
+        public bool SplitWall { get; set; }
+        public bool ExportBaseQuantities { get; set; }
+        public string Name { get; set; }
+        public IFCVersion IFCVersion { get; set; }
+        public int ActiveViewId { get; set; }
     }
 
     public enum IFCLibrary
