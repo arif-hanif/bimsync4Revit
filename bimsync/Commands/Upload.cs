@@ -143,13 +143,15 @@ namespace bimsync.Commands
             RestClient client = new RestClient("https://api.bimsync.com");
             string filename = Path.GetFileName(_path);
 
+            string comment = Services.RemoveControlCharacters(modelSelection.Comment);
+
             //Upload the IFC model
             RestRequest revisionRequest = new RestRequest("v2/projects/" + modelSelection.ProjectId + "/revisions", Method.POST);
             revisionRequest.AddHeader("Authorization", "Bearer " + access_token);
             revisionRequest.AddHeader("Content-Type", "application/ifc");
             revisionRequest.AddHeader("Bimsync-Params", "{" +
                 "\"callbackUrl\": \"http://127.0.0.1:63842/\"," +
-                "\"comment\": \"" + modelSelection.Comment + "\"," +
+                "\"comment\": \"" + comment + "\"," +
                 "\"filename\": \"" + filename + "\"," +
                 "\"model\": \"" + modelSelection.ModelId + "\"}");
 
