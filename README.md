@@ -30,7 +30,9 @@ Edit bimsync.csproj, and make sure that the following lines a correctly pointing
 * Line 52:     <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
 * Line 129 to 134: <PostBuildEvent>...</PostBuildEvent>
 
-Open the solution in Visual Studio 2017, buid it to retrieve the packages, and hit "Start" to run Revit in debug mode.
+You will also need to install the last version of the Revit 2018 IFC plugin, available [here](https://apps.autodesk.com/RVT/en/Detail/Index?id=6193770166503453647&appLang=en&os=Win64&autostart=true)
+
+Open the solution in Visual Studio 2017, buid it to retrieve the packages from Nuget, and hit "Start" to run Revit in debug mode.
 
 ## Installation
 

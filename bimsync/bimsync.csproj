@@ -40,12 +40,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="IFCExportUI">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\AddIns\IFCExporterUI\IFCExportUI.dll</HintPath>
+      <HintPath>$(ProgramW6432)\Autodesk\Revit 2018\AddIns\IFCExporterUI\IFCExportUI.dll</HintPath>
       <Private>False</Private>
       <Aliases>IFCExportUI</Aliases>
     </Reference>
     <Reference Include="IFCExportUIOverride">
-      <HintPath>..\..\..\..\..\..\ProgramData\Autodesk\ApplicationPlugins\IFC 2018.bundle\Contents\2018\IFCExportUIOverride.dll</HintPath>
+      <HintPath>$(ProgramW6432)\..\ProgramData\Autodesk\ApplicationPlugins\IFC 2018.bundle\Contents\2018\IFCExportUIOverride.dll</HintPath>
       <Aliases>IFCExportUIOverride</Aliases>
       <Private>False</Private>
     </Reference>
