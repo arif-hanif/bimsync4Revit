@@ -284,7 +284,11 @@ namespace bimsync.Commands
             Process browserProcess = Process.Start(authorizationRequest);
 
             //Get the browser in front
-            Services.SetForegroundWindow(browserProcess.MainWindowHandle);
+            if (browserProcess != null)
+            {
+                Services.SetForegroundWindow(browserProcess.MainWindowHandle);
+            }
+            
 
             m_Handler.Http = http;
 
